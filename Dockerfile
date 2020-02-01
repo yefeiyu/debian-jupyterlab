@@ -201,9 +201,7 @@ RUN conda install --quiet --yes \
     rm -rf /home/$NB_USER/.cache/yarn && \
     rm -rf /home/$NB_USER/.node-gyp && \
     fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER \
-    echo "c.NotebookApp.password = 'sha1:7487948f625c:9e2e033f3b48c6725db0bb885f90d6edc264e135'">>~/.jupyter/jupyter_notebook_config.py
-
+    fix-permissions /home/$NB_USER 
 EXPOSE 8888
 
 # Configure container startup
