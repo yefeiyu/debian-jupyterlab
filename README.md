@@ -9,3 +9,10 @@ This requires a public key in `~/.ssh/id_rsa.pub`.
 - To run a `jupyter notebook` server on port 8899 with the following command:
 
       docker run -d -p 8899:8888 xxmm/debian-jupyterlab
+Custom necessary elements
+----------------
+### Change `passwd`
+- Pull the image:
+      echo "jovyan:YOURPASSWORD" | chpasswd
+- Build from `Dockerfile`:
+      ARG NB_PASSWD="YOURPASSWORD"
