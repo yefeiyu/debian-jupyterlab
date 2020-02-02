@@ -11,10 +11,19 @@ This requires a public key in `~/.ssh/id_rsa.pub`.
       docker run -d -p 8899:8888 xxmm/debian-jupyterlab
 Custom necessary elements
 ----------------
-### Change `passwd`
+### Modify User `passwd`
 - If you are pull down the image, Please build your `Dockerfile` with this command:
 
       RUN echo "jovyan:YOURPASSWORD" | chpasswd
 - If you are build from THIS `Dockerfile`, Please modify this command directly:
 
       ARG NB_PASSWD="YOURPASSWORD"
+### Modify `jupyter notebook` password
+- First step, In `ipython`, You define your own password and YOUGOTALINE of tokens:
+
+      from notebook.auth import passwd
+      passwd()
+-  Sec step, put this command into `Dockerfile`:
+    
+      RUN echo "c.NotebookApp.password='sha1:JUSTNOWYOURGOT'">>/home/jovyan/.jupyter/jupyter_notebook_config.py  
+      
