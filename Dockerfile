@@ -233,6 +233,7 @@ COPY run.sh /usr/local/bin/
 # Fix permissions on /etc/jupyter as root
 USER root
 RUN fix-permissions /etc/jupyter/
+RUN  chmod a+rx /usr/local/bin/*   
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
