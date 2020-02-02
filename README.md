@@ -12,9 +12,9 @@ This requires a public key in `~/.ssh/id_rsa.pub`.
 Custom necessary elements
 ----------------
 ### Change `passwd`
-- Pull the image:
+- If you are pull down the image, Please build your `Dockerfile` with this command:
 
-      echo "jovyan:YOURPASSWORD" | chpasswd
-- Build from `Dockerfile`:
+      RUN echo "jovyan:YOURPASSWORD" | chpasswd
+- If you are build from THIS `Dockerfile`, Please modify this command directly:
 
       ARG NB_PASSWD="YOURPASSWORD"
