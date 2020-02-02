@@ -13,6 +13,8 @@ Custom necessary elements
 ----------------
 ### Change `passwd`
 - Pull the image:
+
       echo "jovyan:YOURPASSWORD" | chpasswd
 - Build from `Dockerfile`:
+
       ARG NB_PASSWD="YOURPASSWORD"
