@@ -25,5 +25,5 @@ Custom necessary elements
       passwd()
 -  Sec step, put this command into `Dockerfile`:
     
-      RUN echo "c.NotebookApp.password='sha1:JUSTNOWYOURGOT'">>/home/jovyan/.jupyter/jupyter_notebook_config.py  
+       RUN echo "c.NotebookApp.password='sha1:JUSTNOWYOURGOT'">>/home/jovyan/.jupyter/jupyter_notebook_config.py  
       
