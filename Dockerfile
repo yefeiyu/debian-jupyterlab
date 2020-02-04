@@ -4,9 +4,8 @@
 ARG BASE_CONTAINER=debian:latest
 FROM $BASE_CONTAINER
 
-# LABEL maintainer="xxmm <yefeiyu@gmail.com>"
+LABEL maintainer="xxmm <yefeiyu@gmail.com>"
 ARG NB_USER="jovyan"
-ARG NB_PASSWD="jovyan"
 ARG NB_UID="1000"
 ARG NB_GID="100"
 
@@ -24,7 +23,7 @@ RUN apt-get update \
     locales \
     fonts-liberation \
     build-essential \
-    emacs \
+#   emacs \
     vim-nox \
     git \
     inkscape \
@@ -36,7 +35,7 @@ RUN apt-get update \
     netcat \
     pandoc \
     python-dev \
-#     texlive-fonts-extra \
+#   texlive-fonts-extra \
     texlive-fonts-recommended \
     texlive-generic-recommended \
     texlive-latex-base \
@@ -52,8 +51,54 @@ RUN apt-get update \
     w3m \
     openssh-server \
     redis-server \
+    tree \
+    autoconf \
+    automake \
+    autotools-dev \
+    dpkg-dev \
+    gnupg \
+    imagemagick \
+    ispell \
+    libacl1-dev \
+    libasound2-dev \
+    libcanberra-gtk3-module \
+    liblcms2-dev \
+    libdbus-1-dev \
+    libgif-dev \
+    libgnutls28-dev \
+    libgpm-dev \
+    libgtk-3-dev \
+    libjansson-dev \
+    libjpeg-dev \
+    liblockfile-dev \
+    libm17n-dev \
+    libmagick++-6.q16-dev \
+    libncurses5-dev \
+    libotf-dev \
+    libpng-dev \
+    librsvg2-dev \
+    libselinux1-dev \
+    libtiff-dev \
+    libxaw7-dev \
+    libxml2-dev \
+    openssh-client \
+    texinfo \
+    xaw3dg-dev \
+    zlib1g-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+ENV EMACS_BRANCH="emacs-27"
+ENV EMACS_VERSION="27"
+
+RUN cd /opt && \
+    git clone --depth 1 git://git.sv.gnu.org/emacs.git && \
+    cd /opt/emacs && \
+    ./autogen.sh && \
+    ./configure --with-modules && \
+    make -j 8 && \
+    make install && \
+	make clean && \
+	rm -rf /opt/emacs
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
@@ -91,10 +136,8 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 
 # Create SSH remote connection by openssh-server
 # Use this line define $PASSWD.
-RUN echo "${NB_USER}:${NB_PASSWD}" | chpasswd && \
-    echo "${NB_USER}    ALL=(ALL:ALL) ALL" >> /etc/sudoers && \
-    echo "${NB_USER} ALL=NOPASSWD:/bin/mkdir" >> /etc/sudoers && \
-    echo "${NB_USER} ALL=NOPASSWD:/bin/chown" >> /etc/sudoers && \
+# RUN echo "${NB_USER}:${NB_PASSWD}" | chpasswd && \
+RUN echo "${NB_USER}    ALL=(ALL:ALL) ALL" >> /etc/sudoers && \
     echo 'PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/opt/conda/bin:/opt/conda/sbin"' >> /home/${NB_USER}/.profile
 
 RUN mkdir /var/run/sshd && \ 
@@ -110,10 +153,6 @@ EXPOSE 22
 USER $NB_UID
 WORKDIR $HOME
 ARG PYTHON_VERSION=default
-
-# Setup work directory for backward-compatibility
-RUN mkdir /home/$NB_USER/work && \
-    fix-permissions /home/$NB_USER
 
 # Install conda as jovyan and check the md5 sum provided on the download site
 ENV MINICONDA_VERSION=4.7.12.1 \
@@ -135,9 +174,7 @@ RUN cd /tmp && \
     conda install --quiet --yes pip && \
     conda update --all --quiet --yes && \
     conda clean --all -f -y && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    rm -rf /home/$NB_USER/.cache/yarn
 
 # Install Tini
 RUN conda install --quiet --yes 'tini=0.18.0' && \
@@ -201,7 +238,8 @@ RUN conda install --quiet --yes \
     rm -rf /home/$NB_USER/.cache/yarn && \
     rm -rf /home/$NB_USER/.node-gyp && \
     fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER 
+    fix-permissions /home/$NB_USER
+
 EXPOSE 8888
 
 # Configure container startup
@@ -223,17 +261,23 @@ ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
     fix-permissions /home/$NB_USER
 
+# Setup work directory for backward-compatibility and jn for notebook
+RUN mkdir /home/$NB_USER/work && \
+    mkdir /home/$NB_USER/jn && \
+    fix-permissions /home/$NB_USER/work && \
+    fix-permissions /home/$NB_USER/jn && \
+    echo "c.NotebookApp.notebook_dir = '/home/$NB_USER/jn'">>/home/$NB_USER/.jupyter/jupyter_notebook_config.py
+
 # Copy local files as late as possible to avoid cache busting
+USER root
 COPY start.sh /usr/local/bin/
 COPY start-notebook.sh /usr/local/bin/
 COPY start-singleuser.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /etc/jupyter/
 COPY set_root_pw.sh /usr/local/bin/
 COPY run.sh /usr/local/bin/
-# Fix permissions on /etc/jupyter as root
-USER root
-RUN fix-permissions /etc/jupyter/
-RUN  chmod a+rx /usr/local/bin/*   
+RUN chmod a+rx /usr/local/bin/* && \
+    fix-permissions /usr/local/bin  && \
+    fix-permissions /etc/jupyter/
 
-# Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
