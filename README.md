@@ -8,22 +8,22 @@ Using
 This requires a public key in `~/.ssh/id_rsa.pub`.
 - To run a `jupyter notebook` server on port 8899 with the following command:
 
-      docker run -d -p 8899:8888 xxmm/debian-jupyterlab
+      docker run -d -p 8888:8888 xxmm/debian-jupyterlab
 Custom necessary elements
 ----------------
-### Modify User `passwd`
+## Modify User `passwd`
 - If you are pull down the image, Please build your `Dockerfile` with this command:
 
-      RUN echo "jovyan:YOURPASSWORD" | chpasswd
+      RUN echo "$NB_USER:YOURPASSWORD" | chpasswd
 - If you are build from THIS `Dockerfile`, Please modify this command directly:
 
       ARG NB_PASSWD="YOURPASSWORD"
-### Modify `jupyter notebook` password
+## Modify `jupyter notebook` password
 - First step, In `ipython`, You define your own password and YOUGOTALINE of tokens:
 
       from notebook.auth import passwd
       passwd()
--  Sec step, put this command into `Dockerfile`:
+- Sec step, put this command into `Dockerfile`:
     
-       RUN echo "c.NotebookApp.password='sha1:JUSTNOWYOURGOT'">>/home/jovyan/.jupyter/jupyter_notebook_config.py  
+      RUN echo "c.NotebookApp.password='sha1:JUSTNOWYOURGOT'">>/home/jovyan/.jupyter/jupyter_notebook_config.py  
       

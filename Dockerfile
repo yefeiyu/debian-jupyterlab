@@ -5,7 +5,7 @@ ARG BASE_CONTAINER=debian:latest
 FROM $BASE_CONTAINER
 
 LABEL maintainer="xxmm <yefeiyu@gmail.com>"
-ARG NB_USER="jovyan"
+ARG NB_USER="xx"
 ARG NB_UID="1000"
 ARG NB_GID="100"
 
@@ -23,7 +23,7 @@ RUN apt-get update \
     locales \
     fonts-liberation \
     build-essential \
-#   emacs \
+    emacs \
     vim-nox \
     git \
     inkscape \
@@ -35,7 +35,7 @@ RUN apt-get update \
     netcat \
     pandoc \
     python-dev \
-#   texlive-fonts-extra \
+    texlive-fonts-extra \
     texlive-fonts-recommended \
     texlive-generic-recommended \
     texlive-latex-base \
@@ -87,19 +87,6 @@ RUN apt-get update \
     zlib1g-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV EMACS_BRANCH="emacs-27"
-ENV EMACS_VERSION="27"
-
-RUN cd /opt && \
-    git clone --depth 1 git://git.sv.gnu.org/emacs.git && \
-    cd /opt/emacs && \
-    ./autogen.sh && \
-    ./configure --with-modules && \
-    make -j 8 && \
-    make install && \
-	make clean && \
-	rm -rf /opt/emacs
-
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
 
@@ -122,7 +109,7 @@ RUN chmod a+rx /usr/local/bin/fix-permissions
 # Enable prompt color in the skeleton .bashrc before creating the default NB_USER
 RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc
 
-# Create NB_USER wtih name jovyan user with UID=1000 and in the 'users' group
+# Create NB_USER wtih name xx user with UID=1000 and in the 'users' group
 # and make sure these dirs are writable by the `users` group.
 RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
@@ -154,7 +141,7 @@ USER $NB_UID
 WORKDIR $HOME
 ARG PYTHON_VERSION=default
 
-# Install conda as jovyan and check the md5 sum provided on the download site
+# Install conda as xx and check the md5 sum provided on the download site
 ENV MINICONDA_VERSION=4.7.12.1 \
     MINICONDA_MD5=81c773ff87af5cfac79ab862942ab6b3 \
     CONDA_VERSION=4.7.12

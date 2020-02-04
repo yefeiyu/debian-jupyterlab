@@ -5,7 +5,7 @@ if [ -z "${SSH_KEY}" ]; then
 	exit 1
 fi
 
-for MYHOME in /root /home/jovyan; do
+for MYHOME in /root /home/xx; do
 	echo "=> Adding SSH key to ${MYHOME}"
 	mkdir -p ${MYHOME}/.ssh
 	chmod go-rwx ${MYHOME}/.ssh
@@ -13,12 +13,12 @@ for MYHOME in /root /home/jovyan; do
 	chmod go-rw ${MYHOME}/.ssh/authorized_keys
 	echo "=> Done!"
 done
-chown -R jovyan:users /home/jovyan/.ssh
+chown -R xx:users /home/xx/.ssh
 
 echo "========================================================================"
 echo "You can now connect to this container via SSH using:"
 echo ""
 echo "    ssh -p <port> <user>@<host>"
 echo ""
-echo "Choose root (full access) or jovyan (limited user account) as <user>."
+echo "Choose root (full access) or xx (limited user account) as <user>."
 echo "========================================================================"
