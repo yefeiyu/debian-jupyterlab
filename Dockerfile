@@ -23,8 +23,8 @@ RUN apt-get update \
     locales \
     fonts-liberation \
     build-essential \
-    emacs \
-    vim-nox \
+#   emacs \
+    vim-gtk \
     git \
     inkscape \
     jed \
@@ -35,7 +35,7 @@ RUN apt-get update \
     netcat \
     pandoc \
     python-dev \
-    texlive-fonts-extra \
+#   texlive-fonts-extra \
     texlive-fonts-recommended \
     texlive-generic-recommended \
     texlive-latex-base \
@@ -86,7 +86,20 @@ RUN apt-get update \
     xaw3dg-dev \
     zlib1g-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+    
+ENV EMACS_BRANCH="emacs-28"
+ENV EMACS_VERSION="28"
 
+RUN cd /opt && \
+    git clone --depth 1 git://git.sv.gnu.org/emacs.git && \
+    cd /opt/emacs && \
+    ./autogen.sh && \
+    ./configure --with-modules && \
+    make -j 8 && \
+    make install && \
+   	make clean && \
+	   rm -rf /opt/emacs
+ 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
 
