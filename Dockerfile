@@ -208,6 +208,7 @@ RUN conda install --quiet --yes \
     'cmake' \
     'notedown' \
     'virtualenv' \
+    'openpyxl' \
     && conda update -n base conda --quiet --yes \
     && \
     conda clean --all -f -y && \
