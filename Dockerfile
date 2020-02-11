@@ -209,6 +209,7 @@ RUN conda install --quiet --yes \
     'notedown' \
     'virtualenv' \
     'openpyxl' \
+    'tabulate' \
     && conda update -n base conda --quiet --yes \
     && \
     conda clean --all -f -y && \
