@@ -315,8 +315,6 @@ USER $NB_UID
 
 # vnc
 ADD xstartup ./.vnc/xstartup
-RUN chmod a+rx ./.vnc/* && \
-    fix-permissions ./.vnc/
     
 #  Launch the command and run
 CMD ["/bin/bash", "/usr/local/bin/vnc-startup.sh", "--no-exit"]
