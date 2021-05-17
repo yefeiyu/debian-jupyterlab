@@ -96,6 +96,8 @@ RUN apt-get update \
     xvfb \
     xterm \
     fluxbox \
+    xorg \
+    autocutsel \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
  
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
@@ -134,7 +136,7 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 
 # Create SSH remote connection by openssh-server
 # Use this line define $PASSWD.
-# RUN echo "${NB_USER}:${NB_PASSWD}" | chpasswd && \
+RUN echo "${NB_USER}:${NB_PASSWD}" | chpasswd
 RUN echo "${NB_USER}    ALL=(ALL:ALL) ALL" >> /etc/sudoers && \
     echo 'PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/opt/conda/bin:/opt/conda/sbin"' >> /home/${NB_USER}/.profile
 
@@ -148,22 +150,22 @@ EXPOSE 22
 # CMD ["/usr/sbin/sshd", "-D"]
 ##########################################################
 # Create and configure the VNC user
-ARG VNCPASS
-ENV VNCPASS ${VNCPASS:-secret}
+EXPOSE 5901
 
-RUN useradd remote --create-home --shell /bin/bash --user-group --groups adm,sudo && \
-    echo "remote:$VNCPASS" | chpasswd
+WORKDIR $HOME
+# Disable the screen saver
+ADD .xscreensaver .
 
-EXPOSE 80
-EXPOSE 5900
+# Enable the vnc clipboard
+ADD xstartup ./.vnc/xstartup
+RUN chmod +x ./.vnc/xstartup
 
-VOLUME /data
-WORKDIR /data
+# Copy the startup script and run it
+ADD vnc-startup.sh /
+RUN chmod +x /vnc-startup.sh
 
-COPY main.sh /usr/local/bin/
-
-ENTRYPOINT ["/usr/local/bin/main.sh"]
-#CMD ["default"]
+#  Launch the command and run
+CMD ["/bin/bash", "/vnc-startup.sh", "--no-exit"]
 
 ###########################################################
 USER $NB_UID
