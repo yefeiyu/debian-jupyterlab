@@ -92,6 +92,10 @@ RUN apt-get update \
     bash \
     coreutils \
     openssl \
+    x11vnc \
+    xvfb \
+    xterm \
+    fluxbox \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
  
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
@@ -142,6 +146,24 @@ ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 # CMD ["/usr/sbin/sshd", "-D"]
+##########################################################
+# Create and configure the VNC user
+ARG VNCPASS
+ENV VNCPASS ${VNCPASS:-secret}
+
+RUN useradd remote --create-home --shell /bin/bash --user-group --groups adm,sudo && \
+    echo "remote:$VNCPASS" | chpasswd
+
+EXPOSE 80
+EXPOSE 5900
+
+VOLUME /data
+WORKDIR /data
+
+COPY main.sh /usr/local/bin/
+
+ENTRYPOINT ["/usr/local/bin/main.sh"]
+#CMD ["default"]
 
 ###########################################################
 USER $NB_UID
@@ -273,9 +295,6 @@ RUN cd /home/$NB_USER \
     && echo "alias hh=history" 			>> .bashrc \
     && echo "alias hhg='history|grep -i" '"$@"' "'" >> .bashrc
 
-# ports
-EXPOSE 5900
-	
 # Copy local files as late as possible to avoid cache busting
 USER root
 COPY start.sh /usr/local/bin/
@@ -289,3 +308,4 @@ RUN chmod a+rx /usr/local/bin/* && \
     fix-permissions /etc/jupyter/
 
 USER $NB_UID
+
