@@ -162,11 +162,11 @@ ADD xstartup ./.vnc/xstartup
 RUN chmod +x ./.vnc/xstartup
 
 # Copy the startup script and run it
-ADD vnc-startup.sh /
-RUN chmod +x /vnc-startup.sh
+ADD vnc-startup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/vnc-startup.sh
 
 #  Launch the command and run
-CMD ["/bin/bash", "/vnc-startup.sh", "--no-exit"]
+CMD ["/bin/bash", "/usr/local/bin/vnc-startup.sh", "--no-exit"]
 
 ###########################################################
 USER $NB_UID
