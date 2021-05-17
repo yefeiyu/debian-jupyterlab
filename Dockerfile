@@ -110,9 +110,9 @@ ENV CONDA_DIR=/opt/conda \
     NB_USER=$NB_USER \
     NB_UID=$NB_UID \
     NB_GID=$NB_GID \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
+#    LC_ALL=en_US.UTF-8 \
+#    LANG=en_US.UTF-8 \
+#    LANGUAGE=en_US.UTF-8
 ENV PATH=$CONDA_DIR/bin:$PATH \
     HOME=/home/$NB_USER
 
@@ -149,24 +149,6 @@ ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 # CMD ["/usr/sbin/sshd", "-D"]
-##########################################################
-# Create and configure the VNC user
-EXPOSE 5901
-
-WORKDIR $HOME
-# Disable the screen saver
-ADD .xscreensaver .
-
-# Enable the vnc clipboard
-ADD xstartup ./.vnc/xstartup
-RUN chmod +x ./.vnc/xstartup
-
-# Copy the startup script and run it
-ADD vnc-startup.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/vnc-startup.sh
-
-#  Launch the command and run
-CMD ["/bin/bash", "/usr/local/bin/vnc-startup.sh", "--no-exit"]
 
 ###########################################################
 USER $NB_UID
@@ -288,6 +270,7 @@ RUN mkdir /home/$NB_USER/work && \
     fix-permissions /home/$NB_USER/work && \
     fix-permissions /home/$NB_USER/jn && \
     echo "c.NotebookApp.notebook_dir = '/home/$NB_USER/jn'">>/home/$NB_USER/.jupyter/jupyter_notebook_config.py
+
 RUN cd /home/$NB_USER \
     && sed -i 's/#alias/alias/' .bashrc  \
     && echo "alias lla='ls -al'" 		>> .bashrc \
@@ -310,5 +293,29 @@ RUN chmod a+rx /usr/local/bin/* && \
     fix-permissions /usr/local/bin  && \
     fix-permissions /etc/jupyter/
 
+##########################################################
+# Create and configure the VNC user
+EXPOSE 5901
+
+WORKDIR $HOME
+# Disable the screen saver
+ADD .xscreensaver .
+
+# Enable the vnc clipboard
+ADD xstartup ./.vnc/xstartup
+RUN chmod +x ./.vnc/xstartup
+
+# Copy the startup script and run it
+ADD vnc-startup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/vnc-startup.sh
+
+##############################################################
 USER $NB_UID
 
+# vnc
+ADD xstartup ./.vnc/xstartup
+RUN chmod a+rx ./.vnc/* && \
+    fix-permissions ./.vnc/
+    
+#  Launch the command and run
+CMD ["/bin/bash", "/usr/local/bin/vnc-startup.sh", "--no-exit"]
