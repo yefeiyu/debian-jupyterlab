@@ -136,8 +136,8 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 
 # Create SSH remote connection by openssh-server
 # Use this line define $PASSWD.
-RUN echo "${NB_USER}:${NB_PASSWD}" | chpasswd
-RUN echo "${NB_USER}    ALL=(ALL:ALL) ALL" >> /etc/sudoers && \
+RUN echo "${NB_USER}:${NB_PASSWD}" | chpasswd && \
+    echo "${NB_USER}    ALL=(ALL:ALL) ALL" >> /etc/sudoers && \
     echo 'PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/opt/conda/bin:/opt/conda/sbin"' >> /home/${NB_USER}/.profile
 
 RUN mkdir /var/run/sshd && \ 
