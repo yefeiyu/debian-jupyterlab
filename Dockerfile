@@ -9,6 +9,7 @@ ARG NB_USER="xx"
 ARG NB_UID="1000"
 ARG NB_GID="100"
 ARG NB_PASSWD="password"
+ARG VNC_PASSWORD="password"
 
 USER root
 
@@ -107,12 +108,12 @@ RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
 # Configure environment
 ENV CONDA_DIR=/opt/conda \
     SHELL=/bin/bash \
-    NB_USER=$NB_USER \
-    NB_UID=$NB_UID \
-    NB_GID=$NB_GID \
 #    LC_ALL=en_US.UTF-8 \
 #    LANG=en_US.UTF-8 \
 #    LANGUAGE=en_US.UTF-8
+    NB_USER=$NB_USER \
+    NB_UID=$NB_UID \
+    NB_GID=$NB_GID
 ENV PATH=$CONDA_DIR/bin:$PATH \
     HOME=/home/$NB_USER
 
