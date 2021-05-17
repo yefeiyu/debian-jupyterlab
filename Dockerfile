@@ -264,14 +264,14 @@ RUN mkdir /home/$NB_USER/work && \
     fix-permissions /home/$NB_USER/jn && \
     echo "c.NotebookApp.notebook_dir = '/home/$NB_USER/jn'">>/home/$NB_USER/.jupyter/jupyter_notebook_config.py
 RUN cd /home/$NB_USER \
- && sed -i 's/#alias/alias/' .bashrc  \
- && echo "alias lla='ls -al'" 		>> .bashrc \
-	&& echo "alias llt='ls -ltr'"  		>> .bashrc \
-	&& echo "alias llta='ls -altr'" 	>> .bashrc \
-	&& echo "alias llh='ls -lh'" 		>> .bashrc \
-	&& echo "alias lld='ls -l|grep ^d'" >> .bashrc \
-	&& echo "alias hh=history" 			>> .bashrc \
-	&& echo "alias hhg='history|grep -i" '"$@"' "'" >> .bashrc
+    && sed -i 's/#alias/alias/' .bashrc  \
+    && echo "alias lla='ls -al'" 		>> .bashrc \
+    && echo "alias llt='ls -ltr'"  		>> .bashrc \
+    && echo "alias llta='ls -altr'" 	>> .bashrc \
+    && echo "alias llh='ls -lh'" 		>> .bashrc \
+    && echo "alias lld='ls -l|grep ^d'" >> .bashrc \
+    && echo "alias hh=history" 			>> .bashrc \
+    && echo "alias hhg='history|grep -i" '"$@"' "'" >> .bashrc
 
 # ports
 EXPOSE 5900
