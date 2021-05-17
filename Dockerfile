@@ -85,6 +85,13 @@ RUN apt-get update \
     texinfo \
     xaw3dg-dev \
     zlib1g-dev \
+    xfce4 \
+    xfce4-goodies \
+    tightvncserver \
+    procps \
+    bash \
+    coreutils \
+    openssl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
  
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
