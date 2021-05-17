@@ -8,6 +8,7 @@ LABEL maintainer="xxmm <yefeiyu@gmail.com>"
 ARG NB_USER="xx"
 ARG NB_UID="1000"
 ARG NB_GID="100"
+ARG NB_PASSWD="password"
 
 USER root
 
