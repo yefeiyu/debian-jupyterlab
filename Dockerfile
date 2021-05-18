@@ -289,6 +289,7 @@ RUN cd /home/$NB_USER \
     && echo "alias hhg='history|grep -i" '"$@"' "'" >> .bashrc
 
 # Copy local files as late as possible to avoid cache busting
+####root############################################
 USER root
 COPY start.sh /usr/local/bin/
 COPY start-notebook.sh /usr/local/bin/
@@ -300,8 +301,7 @@ RUN chmod a+rx /usr/local/bin/* && \
     fix-permissions /usr/local/bin  && \
     fix-permissions /etc/jupyter/
 
-##########################################################
-# xfce + vncserver
+#### xfce + vncserver
 # ensure everything run.bash needs is there
 # make sudo usage passwordless for members of the "sudo" group (we don't set a password for our default/unprivileged user)
 #RUN echo %sudo ALL=NOPASSWD: ALL > /etc/sudoers.d/sudo-nopasswd
@@ -320,7 +320,7 @@ RUN chmod 755 /etc/vnc/xstartup
 #RUN useradd -ms /bin/bash xx
 #RUN usermod -aG sudo xx
 # from this point on we'll use the "ehlo" user -> $HOME points to  its  home dir (not root's)
-######################
+####USER############################################
 USER $NB_USER
 WORKDIR $HOME
 # create user .vnc dir (needed for vncpasswd in run script) and symlink xstartup file (so it can get updated even when the home dir is a volume)
@@ -333,5 +333,5 @@ EXPOSE 5901
 # persist home dir
 VOLUME $HOME
 # ENTRYPOINT /usr/bin/vncserver && while true; do sleep 30; done
-ENTRYPOINT /usr/local/bin/run.bash
+#ENTRYPOINT /usr/local/bin/run.bash
 
