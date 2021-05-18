@@ -320,17 +320,31 @@ RUN chmod 755 /etc/vnc/xstartup
 #RUN useradd -ms /bin/bash xx
 #RUN usermod -aG sudo xx
 # from this point on we'll use the "ehlo" user -> $HOME points to  its  home dir (not root's)
+####root############################################
+# Create and configure the VNC user
+ARG VNCPASS
+ENV VNCPASS ${VNCPASS:-secret}
+#NV VNCPASSWD="password"
+
+RUN useradd remote --create-home --shell /bin/bash --user-group --groups adm,sudo && \
+    echo "remote:$VNCPASS" | chpasswd
+#UN echo "remote:password" | chpasswd
+
+#XPOSE 80
+EXPOSE 5900
+
+#VOLUME /data
+#WORKDIR /data
+
+COPY main.sh /usr/local/bin
+#
+ENTRYPOINT ["main.sh", "-g", "--"]
+#CMD ["main.sh", "-D"]
+#ENTRYPOINT ["main.sh"]
+#CMD ["default"]
+
 ####USER############################################
 USER $NB_USER
-WORKDIR $HOME
-# create user .vnc dir (needed for vncpasswd in run script) and symlink xstartup file (so it can get updated even when the home dir is a volume)
-RUN mkdir $HOME/.vnc
-RUN ln -s /etc/vnc/xstartup $HOME/.vnc/xstartup
-# the USER env var needs to be explicitly set (not the case with the Debian 10 docker base image), otherwise vncserver refuses to start
-ENV USER $NB_USER
-# the vnc port
-EXPOSE 5901
-# persist home dir
 VOLUME $HOME
 # ENTRYPOINT /usr/bin/vncserver && while true; do sleep 30; done
 #ENTRYPOINT /usr/local/bin/run.bash
