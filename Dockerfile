@@ -5,16 +5,18 @@ ARG BASE_CONTAINER=debian:latest
 FROM $BASE_CONTAINER
 
 LABEL maintainer="xxmm <yefeiyu@gmail.com>"
-ARG NB_USER="xx"
 ARG NB_UID="1000"
 ARG NB_GID="100"
+ARG NB_USER="xx"
 ARG NB_PASSWD="password"
 ARG VNC_PASSWORD="password"
 
+####ROOT#########################################
 USER root
 
 # Install all OS dependencies for notebook server that starts but lacks all
 # features (e.g., download as all possible file formats)
+# without this builds on docker hub get stuck with interactive keyboard selection prompt
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
@@ -99,21 +101,25 @@ RUN apt-get update \
     xterm \
     fluxbox \
     xorg \
+    openbox \
+    vnc4server \
     autocutsel \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
  
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
-
 # Configure environment
 ENV CONDA_DIR=/opt/conda \
     SHELL=/bin/bash \
-#    LC_ALL=en_US.UTF-8 \
-#    LANG=en_US.UTF-8 \
-#    LANGUAGE=en_US.UTF-8
-    NB_USER=$NB_USER \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
     NB_UID=$NB_UID \
-    NB_GID=$NB_GID
+    NB_GID=$NB_GID \
+    NB_USER=$NB_USER \
+    NB_PASSWD=$NB_PASSWD
+
+####USER###########################################
 ENV PATH=$CONDA_DIR/bin:$PATH \
     HOME=/home/$NB_USER
 
@@ -151,8 +157,8 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 # CMD ["/usr/sbin/sshd", "-D"]
 
-###########################################################
-USER $NB_UID
+####USER###############################################
+USER $NB_USER
 WORKDIR $HOME
 ARG PYTHON_VERSION=default
 
@@ -295,26 +301,37 @@ RUN chmod a+rx /usr/local/bin/* && \
     fix-permissions /etc/jupyter/
 
 ##########################################################
-# Create and configure the VNC user
-EXPOSE 5901
+# xfce + vncserver
+# ensure everything run.bash needs is there
+# make sudo usage passwordless for members of the "sudo" group (we don't set a password for our default/unprivileged user)
+#RUN echo %sudo ALL=NOPASSWD: ALL > /etc/sudoers.d/sudo-nopasswd
 
+# copy run script
+COPY run.bash /usr/local/bin/run.bash
+RUN chmod a+x /usr/local/bin/run.bash
+# vnc server config
+# (note: we don't use $HOME/.vnc/xstartup as we want to be able to map $HOME to a Docker volume)
+# RUN echo '#!/bin/bash\nxrdb $HOME/.Xresources\nstartxfce4 &\n' > /etc/vnc/xstartup
+RUN mkdir /etc/vnc
+RUN echo '#!/bin/bash\nstartxfce4 &\n' > /etc/vnc/xstartup
+# xstartup needs to be executable (for at least the user who runs vnc server)
+RUN chmod 755 /etc/vnc/xstartup
+# create user
+#RUN useradd -ms /bin/bash xx
+#RUN usermod -aG sudo xx
+# from this point on we'll use the "ehlo" user -> $HOME points to  its  home dir (not root's)
+######################
+USER $NB_USER
 WORKDIR $HOME
-# Disable the screen saver
-ADD .xscreensaver .
+# create user .vnc dir (needed for vncpasswd in run script) and symlink xstartup file (so it can get updated even when the home dir is a volume)
+RUN mkdir $HOME/.vnc
+RUN ln -s /etc/vnc/xstartup $HOME/.vnc/xstartup
+# the USER env var needs to be explicitly set (not the case with the Debian 10 docker base image), otherwise vncserver refuses to start
+ENV USER $NB_USER
+# the vnc port
+EXPOSE 5901
+# persist home dir
+VOLUME $HOME
+# ENTRYPOINT /usr/bin/vncserver && while true; do sleep 30; done
+ENTRYPOINT /usr/local/bin/run.bash
 
-# Enable the vnc clipboard
-ADD xstartup ./.vnc/xstartup
-RUN chmod +x ./.vnc/xstartup
-
-# Copy the startup script and run it
-ADD vnc-startup.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/vnc-startup.sh
-
-##############################################################
-USER $NB_UID
-
-# vnc
-ADD xstartup ./.vnc/xstartup
-    
-#  Launch the command and run
-CMD ["/bin/bash", "/usr/local/bin/vnc-startup.sh", "--no-exit"]
