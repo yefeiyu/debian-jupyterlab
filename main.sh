@@ -2,7 +2,6 @@
 
 # Start vfb
 # Start vnc
-env VNCPASSWD="password"
 if [ -z "$VNCPASSWD" ]; then
     VNCPASSWD=`openssl rand -base64 6`
     echo ++++++++++++++++++++++++++++++++++++++++++++++++++
