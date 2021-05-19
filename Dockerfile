@@ -9,7 +9,6 @@ ARG NB_UID="1000"
 ARG NB_GID="100"
 ARG NB_USER="xx"
 ARG NB_PASSWD="password"
-ARG VNC_PASSWORD="password"
 
 ####ROOT#########################################
 USER root
@@ -104,6 +103,8 @@ RUN apt-get update \
     openbox \
     vnc4server \
     autocutsel \
+    lynx \
+    net-tools \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
  
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
@@ -254,7 +255,7 @@ EXPOSE 8888
 
 # Configure container startup
 ENTRYPOINT ["tini", "-g", "--"]
-CMD ["start-notebook.sh"]
+#CMD ["start-notebook.sh"]
 
 # Install facets which does not have a pip or conda package at the moment
 RUN cd /tmp && \
@@ -326,10 +327,6 @@ ARG VNCPASS
 ENV VNCPASS ${VNCPASS:-secret}
 #NV VNCPASSWD="password"
 
-RUN useradd remote --create-home --shell /bin/bash --user-group --groups adm,sudo && \
-    echo "remote:$VNCPASS" | chpasswd
-#UN echo "remote:password" | chpasswd
-
 #XPOSE 80
 EXPOSE 5900
 
@@ -338,7 +335,7 @@ EXPOSE 5900
 
 COPY main.sh /usr/local/bin
 #
-ENTRYPOINT ["main.sh", "-g", "--"]
+#ENTRYPOINT ["main.sh", "-g", "--"]
 #CMD ["main.sh", "-D"]
 #ENTRYPOINT ["main.sh"]
 #CMD ["default"]
