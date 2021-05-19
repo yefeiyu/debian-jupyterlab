@@ -302,25 +302,6 @@ RUN chmod a+rx /usr/local/bin/* && \
     fix-permissions /usr/local/bin  && \
     fix-permissions /etc/jupyter/
 
-#### xfce + vncserver
-# ensure everything run.bash needs is there
-# make sudo usage passwordless for members of the "sudo" group (we don't set a password for our default/unprivileged user)
-#RUN echo %sudo ALL=NOPASSWD: ALL > /etc/sudoers.d/sudo-nopasswd
-
-# copy run script
-COPY run.bash /usr/local/bin/run.bash
-RUN chmod a+x /usr/local/bin/run.bash
-# vnc server config
-# (note: we don't use $HOME/.vnc/xstartup as we want to be able to map $HOME to a Docker volume)
-# RUN echo '#!/bin/bash\nxrdb $HOME/.Xresources\nstartxfce4 &\n' > /etc/vnc/xstartup
-RUN mkdir /etc/vnc
-RUN echo '#!/bin/bash\nstartxfce4 &\n' > /etc/vnc/xstartup
-# xstartup needs to be executable (for at least the user who runs vnc server)
-RUN chmod 755 /etc/vnc/xstartup
-# create user
-#RUN useradd -ms /bin/bash xx
-#RUN usermod -aG sudo xx
-# from this point on we'll use the "ehlo" user -> $HOME points to  its  home dir (not root's)
 ####root############################################
 # Create and configure the VNC user
 ARG VNCPASS
