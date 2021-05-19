@@ -24,8 +24,8 @@ sleep 15
 env DISPLAY=:0.0 x11vnc -noxrecord -noxfixes -noxdamage -forever -display :0 &
 env DISPLAY=:0.0 fluxbox 
 
-#f [ -f /app.sh ]
-#hen
-#   /app.sh
-#i
+if [ -f start-notebook.sh ]
+then
+   start-notebook.sh
+fi
 
