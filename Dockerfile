@@ -254,7 +254,7 @@ RUN conda install --quiet --yes \
 EXPOSE 8888
 
 # Configure container startup
-ENTRYPOINT ["tini", "-g", "--"]
+#ENTRYPOINT ["tini", "-g", "--"]
 #CMD ["start-notebook.sh"]
 
 # Install facets which does not have a pip or conda package at the moment
@@ -330,19 +330,14 @@ ENV VNCPASS ${VNCPASS:-secret}
 #XPOSE 80
 EXPOSE 5900
 
-#VOLUME /data
-#WORKDIR /data
-
 COPY main.sh /usr/local/bin
-#
-#ENTRYPOINT ["main.sh", "-g", "--"]
-#CMD ["main.sh", "-D"]
-#ENTRYPOINT ["main.sh"]
-#CMD ["default"]
 
 ####USER############################################
 USER $NB_USER
 VOLUME $HOME
+# Configure container startup
+#ENTRYPOINT ["tini", "-g", "--"]
+#CMD ["start-notebook.sh"]
 # ENTRYPOINT /usr/bin/vncserver && while true; do sleep 30; done
 #ENTRYPOINT /usr/local/bin/run.bash
 
