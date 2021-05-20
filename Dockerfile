@@ -105,6 +105,10 @@ RUN apt-get update \
     autocutsel \
     lynx \
     net-tools \
+    tigervnc-common \
+    tigervnc-viewer \
+    tigervnc-xorg-extension \
+    tigervnc-standalone-server \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
  
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
