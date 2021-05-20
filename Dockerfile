@@ -5,8 +5,8 @@ ARG BASE_CONTAINER=debian:latest
 FROM $BASE_CONTAINER
 
 LABEL maintainer="xxmm <yefeiyu@gmail.com>"
-ARG NB_UID="1001"
-ARG NB_GID="1001"
+ARG NB_UID="1000"
+ARG NB_GID="1000"
 ARG NB_USER="xx"
 ARG NB_PASSWD="password"
 
