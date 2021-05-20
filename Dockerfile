@@ -302,17 +302,6 @@ RUN chmod a+rx /usr/local/bin/* && \
     fix-permissions /usr/local/bin  && \
     fix-permissions /etc/jupyter/
 
-####root############################################
-# Create and configure the VNC user
-ARG VNCPASS
-ENV VNCPASS ${VNCPASS:-secret}
-#NV VNCPASSWD="password"
-
-#XPOSE 80
-EXPOSE 5900
-
-COPY main.sh /usr/local/bin
-
 ####USER############################################
 USER $NB_USER
 VOLUME $HOME
